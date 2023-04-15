@@ -25,7 +25,7 @@ import fix_yahoo_finance as web
 from pandas_datareader.famafrench import get_available_datasets
 
 
-path = 'C:\\fakepath\\OneDrive\\001_Personal_Porfolio_Python_code\\'
+path = '/'
 
 store_data = path + "MyPorfolio_Stock_Data_MSR_MIN.h5"
 #%% prepare prices and factors
