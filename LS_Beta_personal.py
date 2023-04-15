@@ -28,12 +28,6 @@ from pandas_datareader.famafrench import get_available_datasets
 path = '/'
 
 store_data = path + "MyPorfolio_Stock_Data_MSR_MIN.h5"
-#%% prepare prices and factors
-#%%
-#
-#t = pd.read_csv(path + 'NSE_tickerlist.csv')
-#tickers = t['tickers'].tolist()
-#tickers.extend(['^NSEI'])
 
 t = ('HMVL', 'WIPRO', 'SHEMAROO', 'FINCABLES', 'BEL', 'LT', 'EMAMILTD', 'GLENMARK', 'TATAMOTORS', 'ONGC', 'GRASIM', 'TCS', 'CAPF', 'TECHM', 'HDFCBANK', 'IOC', 'INDUSINDBK', 'MARUTI', 'PIIND', 'TVSMOTOR', 'ZEEL', '^NSEI')
 exch = '.NS' #For NSE quotes
@@ -79,15 +73,6 @@ store['stk_data_1']      = stk_data
 store['ffm_data_1']      = ffm_data
 store.close()
 
-
-
-#stk_data = pd.read_hdf(path + "MyPorfolio_Stock_Data_MSR_MIN.h5", 'stk_data')
-#stk_adjcl_prc = stk_data.AdjClose
-#stk_adjcl_prc = stk_data.AdjClose
-#bchmk_adjcl_prc = stk_adjcl_prc['NIFTY50']
-#del stk_adjcl_prc['NIFTY50']
-#stk_ret = stk_adjcl_prc.pct_change()
-
 #%%
 axis_dates          = stk_data.major_axis
 alldates            = pd.DataFrame(axis_dates,index=axis_dates)
@@ -109,16 +94,7 @@ def Ptf_Variance(w, ret):
     var = w.dot(vcv).dot(w.T)
     return var
 
-#n = len(stk_adjcl_prc.columns)    
-#ret = stk_ret
-#w = np.ones((1,n))/n   
-#vcv = ret.cov()
-#mu = ret.mean()
-#num = w.dot(mu.T)
-#den = (w.dot(vcv).dot(w.T))**(0.5)
-#sharpe_ratio = num/den
-#%% estimate betas 
-
+# Estimate Betas
 stk_ret_ff = stk_ret.join(ffm_data.mktrf,how='inner')
 
 betas = pd.DataFrame([],index=axis_eom,columns=axis_id)
@@ -165,6 +141,7 @@ ptf_value_eqw = pd.DataFrame([], index = axis_dates, columns = ['Ptf_Value_EQW']
 for t in axis_dates:
     ptf_value_lsbeta.loc[t] = weights_daily.loc[t].dot(stk_adjcl_prc.loc[t].T)
     ptf_value_eqw.loc[t] = weights_daily_eq.loc[t].dot(stk_adjcl_prc.loc[t].T)
+    
 #%%
 tt = '2017-01-02'
 
@@ -201,6 +178,7 @@ print ('Long Short Beta Strategy Sharpe Ratio')
 print (sharpe_ratio_lsbeta)
 print ('Equal Weighted Optimization OOS Sharpe Ratio')
 print (sharpe_ratio_eqw)
+
 #%%Last Day weight and Units to be purchased
 notional = 54000
 
