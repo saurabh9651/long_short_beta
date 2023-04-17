@@ -1,13 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Feb  4 12:48:43 2017
-
-@author: patel_saurabh_j
-"""
-#%%
-from IPython import get_ipython
-get_ipython().magic('reset -sf')
-
 
 import numpy as np
 import pandas as pd
@@ -15,13 +5,10 @@ import datetime as dt
 from datetime import datetime
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-get_ipython().magic('matplotlib inline')
-
 import statsmodels.formula.api as smf
 import statsmodels.api as sm
-
-import pandas_datareader.data
-import fix_yahoo_finance as web
+import yfinance as yf
+import pandas_datareader.data as web
 from pandas_datareader.famafrench import get_available_datasets
 
 
@@ -41,16 +28,14 @@ for i in t:
         tickers.append(j)
     
 #%%
-start       = '2008-1-1'
+start       = '2017-1-1'
 end         = dt.datetime.now()
 #
-stk_data    = web.download(tickers, start, end)
-stk_data.rename(items={'Adj Close': 'AdjClose'},inplace=True)
-stk_data.rename(minor_axis={'^NSEI': 'NIFTY50'},inplace=True)
-stk_adj         = stk_data.AdjClose
-stk_adjcl       = stk_adj.fillna(method = 'ffill')
-stk_adjcl_prc   = stk_adjcl.fillna(method = 'bfill')
-stk_adjcl_prc   = stk_adjcl_prc.dropna(axis=1)
+stk_data    = yf.download(tickers, start, end)
+stk_data.rename(columns={'Adj Close': 'AdjClose'},inplace=True)
+stk_data = stk_data['AdjClose']
+stk_data.rename(columns={'^NSEI': 'NIFTY50'},inplace=True)
+stk_adjcl_prc = stk_data.fillna(method = 'ffill').fillna(method = 'bfill').dropna(axis=1)
 bchmk_adjcl_prc = stk_adjcl_prc['NIFTY50']
 del stk_adjcl_prc['NIFTY50']
 
@@ -67,20 +52,14 @@ ffm_1           = web.DataReader("F-F_Research_Data_Factors_daily", "famafrench"
 ffm_data        = pd.DataFrame(ffm_1[0]/100)
 ffm_data.columns = ['mktrf','smb','hml','rf']
 
-#
-store           = pd.HDFStore(store_data)
-store['stk_data_1']      = stk_data
-store['ffm_data_1']      = ffm_data
-store.close()
-
-#%%
-axis_dates          = stk_data.major_axis
+axis_dates          = stk_data.resample("D").last().fillna(method="ffill").fillna(method="bfill").index
+print (axis_dates)
 alldates            = pd.DataFrame(axis_dates,index=axis_dates)
 alleom              = alldates.groupby([alldates.index.year,alldates.index.month]).last()
 alleom.index        = alleom.Date
 axis_eom            = alleom.index
 axis_id             = stk_adjcl_prc.columns
-#%%
+
 def Ptf_Sharpe_Ratio(w, ret):
     vcv = ret.cov()
     mu = ret.mean()
@@ -111,31 +90,15 @@ for t in axis_eom[13::]:
     m = b.median()
     weights_eom.loc[t,axis_id[b<m]] = 1/b[b<m].mean()/(b<m).sum()
     weights_eom.loc[t,axis_id[b>m]] = -1/b[b>m].mean()/(b>m).sum()
-    
 
-#betas.to_csv(fn_bb)
-#test4 = pd.read_csv(fn_bb)
-#test4.set_index('Date',inplace=True)
-#
-#store        = pd.HDFStore(fn_bbh5)
-#store['betas']  = betas
-#store.close()
-#
-#store       = pd.HDFStore(fn_wh5)
-#store['w']  = w
-#store.close()
-#
-#test3 = pd.read_hdf(fn_bbh5,'betas')
-#test5 = pd.read_hdf(fn_wh5,'w')
-
-#%% backtest 
+#backtest 
 weights_daily = pd.DataFrame(weights_eom, index = axis_dates, columns = axis_id)
 weights_daily = weights_daily.fillna(method = 'ffill')
 
 eq_w = 1/n
 weights_daily_eq = pd.DataFrame(eq_w, index = axis_dates, columns = axis_id)
 weights_eom_eqw = pd.DataFrame(weights_daily_eq, index = axis_eom, columns = axis_id)
-#%%
+#
 ptf_value_lsbeta = pd.DataFrame([], index = axis_dates, columns = ['Ptf_Value_LSBeta'])
 ptf_value_eqw = pd.DataFrame([], index = axis_dates, columns = ['Ptf_Value_EQW'])
 for t in axis_dates:
@@ -161,8 +124,7 @@ for t in hundred_base_lsbeta.index:
         
 all_val = pd.concat([hundred_base_lsbeta, hundred_base_eqw, hundred_base_bchmk], axis=1, join='inner')
 #all_val.plot()
-#%%
-
+#
 oos = tt
 ptf_ret_lsbeta = ptf_value_lsbeta.loc[oos::].pct_change()
 ptf_ret_eqw = ptf_value_eqw.loc[oos::].pct_change()
@@ -171,7 +133,7 @@ ptf_ret_bchmk = hundred_base_bchmk.loc[oos::].pct_change()
 sharpe_ratio_lsbeta = (ptf_ret_lsbeta.mean()*252) / (ptf_ret_lsbeta.std()*((252)**0.5))
 sharpe_ratio_eqw = (ptf_ret_eqw.mean()*252) / (ptf_ret_eqw.std()*((252)**0.5))
 sharpe_ratio_bchmk = (ptf_ret_bchmk.mean()*252) / (ptf_ret_bchmk.std()*((252)**0.5))
-#%%
+#
 
 all_val.plot()
 print ('Long Short Beta Strategy Sharpe Ratio')
@@ -179,8 +141,8 @@ print (sharpe_ratio_lsbeta)
 print ('Equal Weighted Optimization OOS Sharpe Ratio')
 print (sharpe_ratio_eqw)
 
-#%%Last Day weight and Units to be purchased
-notional = 54000
+#Last Day weight and Units to be purchased
+notional = 100000
 
 today = end
 
