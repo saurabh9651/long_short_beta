@@ -1,23 +1,37 @@
-## Enhancing Portfolio Performance with the Long-Short Beta Trading Strategy
+# Enhancing Portfolio Performance with the Long-Short Beta Trading Strategy
 
-### ABSTRACT
+## Introduction
+The long-short beta trading strategy presented in this repository is designed to capitalize on market inefficiencies by constructing a beta-neutral portfolio. The strategy goes long on stocks with low beta values and short on those with high beta values, aiming to exploit relative mispricings while mitigating market risk.
 
-This study presents a novel long-short beta trading strategy aimed at boosting portfolio performance by exploiting relative stock market mispricings. Using stock data from the National Stock Exchange of India (NSE), we construct a beta-neutral portfolio by going long on stocks with low beta values and shorting those with high beta values. The performance of this strategy is compared to an equal-weighted benchmark, with both strategies being analyzed in terms of their Sharpe ratios. Our results demonstrate that the long-short beta trading strategy outperforms the equal-weighted benchmark, offering investors a valuable tool to enhance their returns while mitigating risks.
+The performance of this strategy is compared to an equal-weighted benchmark, which simply assigns equal weights to all stocks in the portfolio.
 
-### Code Process Explanation:
+## Installation
+To use this code, you need to have Python 3.x installed on your system along with the following libraries:
+```
+numpy
+pandas
+datetime
+matplotlib
+yfinance
+```
+You can install the required libraries using pip:
+```python
+pip install numpy pandas datetime matplotlib statsmodels yfinance
+```
+## Usage
+1. Clone this repository to your local machine:
+```git
+git clone https://github.com/yourusername/Long-Short-Beta-Trading-Strategy.git
+```
+2. Open the long_short_beta_trading.py script in your favorite code editor and update the file paths and tickers as needed.
+3. Run the script:
+```python
+python long_short_beta_trading.py
+```
+The script will download the stock data, estimate beta values, and calculate portfolio weights and values for both the long-short beta trading strategy and the equal-weighted benchmark. The Sharpe ratios and portfolio weights will be displayed in the console.
 
-1. Import necessary libraries and modules.
-2. Define file paths, tickers, and dates for the stock data.
-3. Retrieve stock data and process it by calculating adjusted closing prices and returns.
-4. Prepare Fama-French factors by downloading data from the Fama-French dataset.
-5. Store the stock data and Fama-French factors in an HDF5 file for future use.
-6. Calculate end-of-month dates and create a placeholder for beta values and portfolio weights.
-7. Estimate beta values for each stock using rolling 12-month windows and the market return factor from Fama-French data.
-8. Calculate portfolio weights based on median beta values, going long on low-beta stocks and short on high-beta stocks.
-9. Backtest the long-short beta trading strategy by calculating daily portfolio values and rebalancing at the end of each month.
-10. Calculate equal-weighted portfolio values for comparison.
-11. Calculate the Sharpe ratio for the long-short beta trading strategy and the equal-weighted benchmark.
-12. Plot the performance of the long-short beta strategy, the equal-weighted benchmark, and the index.
-13. Print portfolio weights and units to be purchased for both strategies on the last day.
+## Results
+The long-short beta trading strategy demonstrates improved performance compared to the equal-weighted benchmark. The Sharpe ratios of the two strategies indicate that the long-short beta trading strategy is more effective at enhancing returns while mitigating risks.
 
-By following this code process, we can analyze and compare the performance of the long-short beta trading strategy and the equal-weighted benchmark, thereby demonstrating the effectiveness of our proposed strategy in enhancing portfolio performance.
+## License
+This project is licensed under the MIT License. See the LICENSE file for details.
