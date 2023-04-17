@@ -1,4 +1,4 @@
-# Enhancing Portfolio Performance with the Long-Short Beta Trading Strategy
+# Long-Short Beta Trading Strategy
 
 ## Introduction
 The long-short beta trading strategy presented in this repository is designed to capitalize on market inefficiencies by constructing a beta-neutral portfolio. The strategy goes long on stocks with low beta values and short on those with high beta values, aiming to exploit relative mispricings while mitigating market risk.
